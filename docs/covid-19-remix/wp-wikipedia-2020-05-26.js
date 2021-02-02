@@ -69,7 +69,7 @@ function importCSV() {
     }
   };
 
-  xmlhttp.open("GET", "../datafiles/worldwide2.csv", true);
+  xmlhttp.open("GET", "./datafiles/worldwide2.csv", true);
   xmlhttp.send();
 }
 

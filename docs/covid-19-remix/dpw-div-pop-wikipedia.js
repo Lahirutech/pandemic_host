@@ -35,7 +35,7 @@ DMT.displayYourMessage = function (intersected) {
         ? "NA"
         : Number(line.recoveries).toLocaleString()
     }<br>
-		<a href="../../Mushroom/srilanka.html"> Country Level Data Explore </a>
+		<a href="../Mushroom/srilanka.html"> Country Level Data Explore </a>
 		</div>`;
   } else {
     DMTdivPopUp.innerHTML = `
