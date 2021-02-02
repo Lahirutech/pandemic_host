@@ -34,7 +34,7 @@ DMT.displayYourMessage = function ( intersected ) {
 		Total cases: ${ Number( line.cases ).toLocaleString() }<br>
 		Total deaths: ${ Number( line.deaths ).toLocaleString() }<br>
 		Total recoveries: ${ isNaN( Number( line.recoveries ) ) ? "NA" : Number( line.recoveries ).toLocaleString() }<br>
-		<a href="../../Mushroom/srilanka.html"> Country Level Data Explore </a>
+		<a href="../Mushroom/srilanka.html"> Country Level Data Explore </a>
 		</div>`;
 
 	}else{
