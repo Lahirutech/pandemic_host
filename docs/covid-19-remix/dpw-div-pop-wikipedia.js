@@ -2,76 +2,73 @@
 // 2020-03-26
 /* global THR, resetGroups , THREE, camera, renderer,intersected, linecases, DMTdragParent, divMessage */
 
-
-
 const DPW = {};
 
+DMT.displayYourMessage = function (intersected) {
+  //console.log( "event", event );
+  //console.log( "DMT.intersects", DMT.intersects );
 
+  DMTdivPopUp.hidden = false;
+  DMTdivPopUp.style.left = event.clientX + "px";
+  DMTdivPopUp.style.top = event.clientY + "px";
 
-DMT.displayYourMessage = function ( intersected ) {
+  WP.places = intersected.userData.places;
+  const index = DMT.intersects[0].instanceId;
+  const line = WP.places[index];
+  WP.line = line;
 
-	//console.log( "event", event );
-	//console.log( "DMT.intersects", DMT.intersects );
+  WP.place = line.region ? line.region : line.country;
+  console.log("wp.place", WP.place);
 
-	DMTdivPopUp.hidden = false;
-	DMTdivPopUp.style.left = event.clientX + "px";
-	DMTdivPopUp.style.top = event.clientY + "px";
+  WP.dataLinks = c19LinksGlobal.find(
+    (link) => link.country === line.country && link.region === line.region
+  );
 
-	WP.places = intersected.userData.places;
-	const index = DMT.intersects[ 0 ].instanceId;
-	const line = WP.places[ index ];
-	WP.line = line;
-
-	WP.place = line.region ? line.region : line.country;
-	console.log( "wp.place", WP.place );
-
-	WP.dataLinks = c19LinksGlobal.find( link => link.country === line.country && link.region === line.region );
-
-	if(index==95){
-		DMTdivPopUp.innerHTML = `
+  if (index == 95) {
+    DMTdivPopUp.innerHTML = `
 	<div id=DMTdivIntersected>
-	Country: ${ WP.place  }<br>
-		Total cases: ${ Number( line.cases ).toLocaleString() }<br>
-		Total deaths: ${ Number( line.deaths ).toLocaleString() }<br>
-		Total recoveries: ${ isNaN( Number( line.recoveries ) ) ? "NA" : Number( line.recoveries ).toLocaleString() }<br>
-		<a href="../Mushroom/srilanka.html"> Country Level Data Explore </a>
+	Country: ${WP.place}<br>
+		Total cases: ${Number(line.cases).toLocaleString()}<br>
+		Total deaths: ${Number(line.deaths).toLocaleString()}<br>
+		Total recoveries: ${
+      isNaN(Number(line.recoveries))
+        ? "NA"
+        : Number(line.recoveries).toLocaleString()
+    }<br>
+		<a href="../../Mushroom/srilanka.html"> Country Level Data Explore </a>
 		</div>`;
-
-	}else{
-		DMTdivPopUp.innerHTML = `
+  } else {
+    DMTdivPopUp.innerHTML = `
 	<div id=DMTdivIntersected>
-	Country: ${  WP.place }<br>
-	Total cases: ${ Number( line.cases ).toLocaleString() }<br>
-	Total deaths: ${ Number( line.deaths ).toLocaleString() }<br>
-	Total recoveries: ${ isNaN( Number( line.recoveries ) ) ? "NA" : Number( line.recoveries ).toLocaleString() }<br>
+	Country: ${WP.place}<br>
+	Total cases: ${Number(line.cases).toLocaleString()}<br>
+	Total deaths: ${Number(line.deaths).toLocaleString()}<br>
+	Total recoveries: ${
+    isNaN(Number(line.recoveries))
+      ? "NA"
+      : Number(line.recoveries).toLocaleString()
+  }<br>
 		</div>`;
-	}
-
-
-
+  }
 };
 
-
-
 WP.getPopUpMore = function () {
+  //console.log( "", WP.line, WP.place, WP.chart );
 
-	//console.log( "", WP.line, WP.place, WP.chart );
+  let chart;
+  let template;
+  WP.htmPlace = "";
+  let htmJhu = "";
+  let chartIdx = 1;
 
-	let chart;
-	let template;
-	WP.htmPlace = "";
-	let htmJhu = "";
-	let chartIdx = 1;
+  if (WP.places === c19GeoDataUsa) {
+    // chart = WP.dataLinks.chart + "_medical cases chart";
 
-	if ( WP.places === c19GeoDataUsa ) {
+    // template = "Template:2019–20_coronavirus_pandemic_data/United_States/";
 
-		// chart = WP.dataLinks.chart + "_medical cases chart";
-
-		// template = "Template:2019–20_coronavirus_pandemic_data/United_States/";
-
-		WP.htmPlace = `
+    WP.htmPlace = `
 		<div>
-			Data courtesy of Wikipedia: <a href="${ WP.chartPrefix }${ WP.dataLinks.article }" target="_blank">${ WP.place }</a>
+			Data courtesy of Wikipedia: <a href="${WP.chartPrefix}${WP.dataLinks.article}" target="_blank">${WP.place}</a>
 		<div>
 		<p>
 			<button onclick=WP.getInfoboxes();>infobox</button>
@@ -83,12 +80,10 @@ WP.getPopUpMore = function () {
 			<button onclick=WP.getGraphs(); >graphs</button>
 
 		</p>`;
-
-	} else {
-
-		WP.htmPlace = `
+  } else {
+    WP.htmPlace = `
 		<div>
-			Data courtesy of Wikipedia: <a href="${ WP.chartPrefix }${ WP.dataLinks.article }" target="_blank">${ WP.place }</a>
+			Data courtesy of Wikipedia: <a href="${WP.chartPrefix}${WP.dataLinks.article}" target="_blank">${WP.place}</a>
 		<div>
 		<p>
 			<button onclick=WP.getInfoboxes();>infobox</button>
@@ -100,255 +95,222 @@ WP.getPopUpMore = function () {
 			<button onclick=WP.getGraphs(); >graphs</button>
 
 		</p>`;
+  }
 
-	}
+  DMTdivPopUp.innerHTML = DMT.htmlPopUp;
 
-
-
-	DMTdivPopUp.innerHTML = DMT.htmlPopUp;
-
-	DMTdivContent.innerHTML = `
-	<div id="DMTdivJhu"  >${ htmJhu }</div>
-	<div id="DMTdivMoreButtons" >${ WP.htmPlace }</div>
+  DMTdivContent.innerHTML = `
+	<div id="DMTdivJhu"  >${htmJhu}</div>
+	<div id="DMTdivMoreButtons" >${WP.htmPlace}</div>
 	<div id=WPdivGraph><div>
 	`;
 
+  WP.getInfoboxes();
 
-	WP.getInfoboxes();
-
-	DMTdivHeader.addEventListener( "mousedown", DMT.onMouseDown );
-	DMTdivHeader.addEventListener( "touchstart", DMT.onMouseDown );
-
+  DMTdivHeader.addEventListener("mousedown", DMT.onMouseDown);
+  DMTdivHeader.addEventListener("touchstart", DMT.onMouseDown);
 };
-
-
 
 //////////
 
 WP.getInfoboxes = function () {
+  const url =
+    WP.cors +
+    WP.api +
+    WP.query +
+    "COVID-19_pandemic_in_" +
+    WP.dataLinks.article;
+  //console.log( "", url );
 
-	const url = WP.cors + WP.api + WP.query + "COVID-19_pandemic_in_" + WP.dataLinks.article;
-	//console.log( "", url );
+  WPdivGraph.innerHTML = `<img src="progress-indicator.gif" width=100 >`;
 
-	WPdivGraph.innerHTML = `<img src="progress-indicator.gif" width=100 >`;
-
-	requestFile( url, WP.onLoadDataInfoboxes );
-
+  requestFile(url, WP.onLoadDataInfoboxes);
 };
 
+WP.onLoadDataInfoboxes = function (xhr) {
+  const response = xhr.target.response;
 
+  const json = JSON.parse(response);
+  //console.log( 'json',json );
 
-WP.onLoadDataInfoboxes = function ( xhr ) {
+  let text = json.parse.text["*"];
+  //console.log( 'text', text );
 
-	const response = xhr.target.response;
+  text = text
+    .replace(/\<a href(.*?)>/gi, "")
+    .replace(/\<ul>(.*?)\<\/ul>/i, "")
+    .replace(/\[(.*?)\]/g, "");
 
-	const json = JSON.parse( response );
-	//console.log( 'json',json );
+  const parser = new DOMParser();
+  WP.html = parser.parseFromString(text, "text/html");
 
-	let text = json.parse.text[ "*" ];
-	//console.log( 'text', text );
+  const infoboxes = WP.html.querySelectorAll(".infobox");
+  //console.log( "ib", infoboxes );
 
-	text = text
-		.replace( /\<a href(.*?)>/gi, "" )
-		.replace( /\<ul>(.*?)\<\/ul>/i, "" )
-		.replace( /\[(.*?)\]/g, "" );
+  WPdivGraph.innerHTML = !infoboxes.length
+    ? `<p>Wikipedia article for ${WP.place} has no infoboxes.</p>`
+    : "";
 
-	const parser = new DOMParser();
-	WP.html = parser.parseFromString( text, "text/html" );
+  infoboxes.forEach((infobox) => {
+    //console.log( "infobox", infobox );
 
-	const infoboxes = WP.html.querySelectorAll( ".infobox" );
-	//console.log( "ib", infoboxes );
+    if (location.protocol.includes("file")) {
+      images = infobox.querySelectorAll("img");
+      images.onload = DMT.onLoadMore;
+      images.forEach((image) => (image.src = "https://" + image.src.slice(5)));
+    }
 
-	WPdivGraph.innerHTML = !infoboxes.length ?
-		`<p>Wikipedia article for ${ WP.place } has no infoboxes.</p>`
-		:
-		"";
+    refs = infobox.querySelectorAll(".reference");
+    refs.forEach((ref) => (ref.outerHTML = ""));
+    WPdivGraph.innerHTML += infobox.outerHTML + "<br><hr>";
+  });
 
-	infoboxes.forEach( infobox => {
-		//console.log( "infobox", infobox );
+  DMT.onLoadMore(); // seems to need to run twice
 
-		if ( location.protocol.includes( "file" ) ) {
+  setTimeout(DMT.onLoadMore, 100);
 
-			images = infobox.querySelectorAll( "img" );
-			images.onload = DMT.onLoadMore;
-			images.forEach( image => image.src = "https://" + image.src.slice( 5 ) );
-
-		}
-
-		refs = infobox.querySelectorAll( ".reference" );
-		refs.forEach( ref => ref.outerHTML = "" );
-		WPdivGraph.innerHTML += infobox.outerHTML + "<br><hr>";
-
-	} );
-
-
-	DMT.onLoadMore(); // seems to need to run twice
-
-	setTimeout( DMT.onLoadMore, 100 );
-
-	WPdivGraph.scrollTop = 660;
-
+  WPdivGraph.scrollTop = 660;
 };
-
-
 
 //////////
 
 WP.getCases = function () {
+  let chart, template;
 
-	let chart, template;
+  if (WP.places === c19GeoDataUsa) {
+    chart = WP.dataLinks.chart + "_medical cases chart";
 
-	if ( WP.places === c19GeoDataUsa ) {
+    template = "Template:COVID-19_pandemic_data/United_States/";
+  } else {
+    WP.chart = WP.dataLinks.chart;
 
-		chart = WP.dataLinks.chart + "_medical cases chart";
+    const suffix =
+      WP.chart === "United States"
+        ? "_medical cases by state"
+        : "_medical cases chart";
 
-		template = "Template:COVID-19_pandemic_data/United_States/";
+    chart = WP.chart + suffix;
 
-	} else {
+    template = WP.templateGlobal + "/";
+  }
 
-		WP.chart = WP.dataLinks.chart;
+  const chartIdx = WP.dataLinks.chartIdx;
 
-		const suffix = WP.chart === "United States" ? "_medical cases by state" : "_medical cases chart";
+  if (chartIdx > 0) {
+    const url = WP.cors + WP.api + WP.query + template + chart;
 
-		chart = WP.chart + suffix;
+    requestFile(url, WP.onLoadBarBox);
 
-		template = WP.templateGlobal + "/";
-
-	}
-
-	const chartIdx = WP.dataLinks.chartIdx;
-
-	if ( chartIdx > 0 ) {
-
-		const url = WP.cors + WP.api + WP.query + template + chart;
-
-		requestFile( url, WP.onLoadBarBox );
-
-		WPdivGraph.innerHTML = `<img src="progress-indicator.gif" width=100 >`;
-
-	} else {
-
-		WPdivGraph.innerHTML = "No chart available";
-
-	}
-
+    WPdivGraph.innerHTML = `<img src="progress-indicator.gif" width=100 >`;
+  } else {
+    WPdivGraph.innerHTML = "No chart available";
+  }
 };
 
+WP.onLoadBarBox = function (xhr) {
+  const response = xhr.target.response;
 
+  const json = JSON.parse(response);
+  //console.log( 'json',json );
 
-WP.onLoadBarBox = function ( xhr ) {
+  let text = json.parse.text["*"];
+  //console.log( 'text', text );
 
-	const response = xhr.target.response;
+  const parser = new DOMParser();
+  const html = parser.parseFromString(text, "text/html");
 
-	const json = JSON.parse( response );
-	//console.log( 'json',json );
+  const bbox = html.querySelector(".barbox");
+  //console.log( bboxes );
 
-	let text = json.parse.text[ "*" ];
-	//console.log( 'text', text );
+  const plinks = bbox.querySelectorAll(
+    `.plainlinks, .reflist, td[colspan="5"]`
+  );
+  //console.log( "plinks", plinks );
 
-	const parser = new DOMParser();
-	const html = parser.parseFromString( text, "text/html" );
+  plinks.forEach((link) => (link.style.display = "none"));
 
-	const bbox = html.querySelector( ".barbox" );
-	//console.log( bboxes );
+  const s = new XMLSerializer();
 
-	const plinks = bbox.querySelectorAll( `.plainlinks, .reflist, td[colspan="5"]` );
-	//console.log( "plinks", plinks );
+  str = s.serializeToString(bbox);
 
-	plinks.forEach( link => link.style.display = "none" );
+  str = str.replace(/\[(.*?)\]/g, "");
 
-	const s = new XMLSerializer();
-
-	str = s.serializeToString( bbox );
-
-	str = str.replace( /\[(.*?)\]/g, "" );
-
-	WPdivGraph.innerHTML = `
+  WPdivGraph.innerHTML = `
 <p><button onclick=DMTdivContent.scrollTop=8888>&dArr; scroll to latest</button ></p>
-${ str }
+${str}
 <p><button onclick=DMTdivContent.scrollTop=0>&uArr; scroll to top</button ></p >
 `;
 
-	DMT.onLoadMore(); // seems to need to run twice
+  DMT.onLoadMore(); // seems to need to run twice
 
-	setTimeout( DMT.onLoadMore, 100 );
+  setTimeout(DMT.onLoadMore, 100);
 
-	WPdivGraph.scrollTop = 0;
-
+  WPdivGraph.scrollTop = 0;
 };
-
-
 
 //////////
 
 WP.getTables = function () {
+  const tables = WP.html.querySelectorAll(".wikitable");
 
-	const tables = WP.html.querySelectorAll( ".wikitable" );
+  WPdivGraph.innerHTML = !tables.length
+    ? `<p>Wikipedia article for ${WP.place} has no tables.</p>`
+    : "";
 
-	WPdivGraph.innerHTML = ! tables.length ?
-		`<p>Wikipedia article for ${ WP.place } has no tables.</p>`
-		:
-		"";
+  const s = new XMLSerializer();
 
-	const s = new XMLSerializer();
+  tables.forEach((table) => {
+    const plinks = table.querySelectorAll(
+      `img, .plainlinks, .reference, .reflist, td[colspan="5"]`
+    );
+    plinks.forEach((link) => (link.outerHTML = ""));
 
-	tables.forEach( table => {
+    const str = s.serializeToString(table);
 
-		const plinks = table.querySelectorAll( `img, .plainlinks, .reference, .reflist, td[colspan="5"]` );
-		plinks.forEach( link => link.outerHTML = "" );
+    WPdivGraph.innerHTML += str + "<br><hr>";
+  });
 
-		const str = s.serializeToString( table );
+  DMT.onLoadMore(); // seems to need to run twice
 
-		WPdivGraph.innerHTML += str + "<br><hr>";
+  setTimeout(DMT.onLoadMore, 100);
 
-	} );
-
-	DMT.onLoadMore(); // seems to need to run twice
-
-	setTimeout( DMT.onLoadMore, 100 );
-
-	WPdivGraph.scrollTop = 0;
-
+  WPdivGraph.scrollTop = 0;
 };
 
-
 WP.getGraphs = function () {
+  const graphs = WP.html.querySelectorAll(".mw-graph");
 
-	const graphs = WP.html.querySelectorAll( ".mw-graph" );
+  WPdivGraph.innerHTML = !graphs.length
+    ? `<p>Wikipedia article for ${WP.place} has no graphs.</p>`
+    : "";
 
-	WPdivGraph.innerHTML = ! graphs.length ?
-		`<p>Wikipedia article for ${ WP.place } has no graphs.</p>`
-		:
-		"";
+  const s = new XMLSerializer();
 
-	const s = new XMLSerializer();
+  graphs.forEach((graph) => {
+    const plinks = graph.querySelectorAll(
+      `.plainlinks, .reference, .reflist, td[colspan="5"]`
+    );
+    plinks.forEach((link) => (link.outerHTML = ""));
 
-	graphs.forEach( graph => {
+    const images = graph.querySelectorAll("img");
+    //console.log( "images", images );
 
-		const plinks = graph.querySelectorAll( `.plainlinks, .reference, .reflist, td[colspan="5"]` );
-		plinks.forEach( link => link.outerHTML = "" );
+    images.forEach((image) => {
+      //console.log( "image", image );
+      //console.log( "src", "https://en.wikipedia.org" + image.src.slice( image.src.indexOf( "/api" ) ) );
+      image.src =
+        "https://en.wikipedia.org" + image.src.slice(image.src.indexOf("/api"));
+    });
+    images.forEach((image) => (image.style.maxWidth = "50rem"));
 
-		const images = graph.querySelectorAll( "img" );
-		//console.log( "images", images );
+    const str = s.serializeToString(graph);
 
-		images.forEach( image => {
-			//console.log( "image", image );
-			//console.log( "src", "https://en.wikipedia.org" + image.src.slice( image.src.indexOf( "/api" ) ) );
-			image.src = "https://en.wikipedia.org" + image.src.slice( image.src.indexOf( "/api" ) );
-		} );
-		images.forEach( image => image.style.maxWidth = "50rem" );
+    WPdivGraph.innerHTML += str + "<br><hr>";
+  });
 
-		const str = s.serializeToString( graph );
+  DMT.onLoadMore(); // seems to need to run twice
 
-		WPdivGraph.innerHTML += str + "<br><hr>";
+  setTimeout(DMT.onLoadMore, 100);
 
-	} );
-
-	DMT.onLoadMore(); // seems to need to run twice
-
-	setTimeout( DMT.onLoadMore, 100 );
-
-	WPdivGraph.scrollTop = 0;
-
-
-}
+  WPdivGraph.scrollTop = 0;
+};
